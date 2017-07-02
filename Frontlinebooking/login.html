@@ -1,0 +1,14 @@
+﻿<div ng-controller="loginCtrl as loginCtrl">
+	<form class="form-signin">
+		<h2 class="form-signin-heading"></h2>
+		<label for="inputEmail" class="sr-only">Användarnamn</label>
+		<input type="text" id="inputEmail" ng-model="loginCtrl.email" class="form-control" placeholder="Användarnamn" required="" autofocus="">
+		<label for="inputPassword" class="sr-only">Lösenord</label>
+		<input type="password" id="inputPassword" ng-model="loginCtrl.password" class="form-control" placeholder="Password" required="">
+
+		<button class="btn btn-lg btn-primary btn-block" ng-click="loginCtrl.login()" type="submit">
+			<span ng-if="!loginCtrl.isLoading">Logga in</span>
+			<span ng-if="loginCtrl.isLoading"><i class="fa fa-circle-o-notch fa-spin  fa-fw"></i></span>
+		</button>
+	</form>
+</div>

@@ -1,0 +1,131 @@
+﻿<div ng-controller="mainCtrl as mainCtrl" style="margin-top: 55px;">
+
+
+    <div class="w3-bar w3-light-grey w3-border" ng-if="mainCtrl.isAdmin">
+        <a href="" class="w3-bar-item w3-button w3-green"><i class="fa fa-home"></i></a>
+        <div class="w3-dropdown-click">
+            <button class="w3-button" ng-click="mainCtrl.showDropdown = !mainCtrl.showDropdown" ng-init="mainCtrl.showDropdown = false">
+                {{mainCtrl.bookingsService.selectedCompany}} <i class="fa fa-caret-down"></i>
+            </button>
+            <div style="z-index: 1000" class="w3-dropdown-content w3-bar-block w3-card-4" ng-class="{'w3-show': mainCtrl.showDropdown}">
+                <a href="" ng-repeat="user in mainCtrl.userService.allUsers" ng-click="mainCtrl.showDropdown = false;mainCtrl.switchUser(user);" class="w3-bar-item w3-button">{{user.company}}</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="w3-container">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="w3-container">
+                    <h2>
+                        <img ng-src="{{mainCtrl.userService.user.logoUrl}}" style="height: 100px; width: 200px;" />
+                    </h2>
+                    <div class="w3-card-4">
+                        <header class="w3-container w3-white">
+                            <div class="row">
+                                <div class="col-xs-2">
+                                    <h4>BJJ-pass </h4>
+                                </div>
+                                <div class="col-xs-3 col-xs-offset-6">
+                                    <button ng-if="mainCtrl.isAdmin" ng-click="mainCtrl.isEditmode = !mainCtrl.isEditmode" class="w3-button"><i class="fa fa-pencil"></i></button>
+                                    <button ng-if="mainCtrl.isEditmode" ng-click="mainCtrl.saveChanges()" type="button" class="w3-border w3-green"><span ng-if="!mainCtrl.isSaving">Spara </span><span><i ng-if="mainCtrl.isSaving" class="fa fa-refresh fa-spin"></i></span></button>
+                                </div>
+                                <div class="col-xs-1 col-xs-offset-9">
+                                    <div class="w3-dropdown-hover">
+                                        <button class="w3-small w3-white w3-border"><i class="fa fa-chevron-down"></i></button>
+                                        <div class="w3-dropdown-content w3-bar-block w3-border">
+                                            <!--<a href="" ng-click="mainCtrl.changePassword();" class="w3-bar-item w3-button w3-small">Byt lösenord</a>-->
+                                            <a href="" ng-click="mainCtrl.signOut();" class="w3-bar-item w3-button w3-small">Logga ut</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </header>
+                        <div class="w3-container" ng-repeat="booking in mainCtrl.bookingsService.bookings" ng-controller="bookingCtrl as bookingCtrl">
+                            <table class="table">
+                                <tr ng-init="bookingCtrl.initialize(booking)">
+                                    <td class="col-xs-2">
+                                        <div ng-if="!mainCtrl.isEditmode"> <i class="fa fa-calendar"></i> {{bookingCtrl.booking.date}}</div>
+                                        <div ng-if="mainCtrl.isEditmode">
+                                            <label class="w3-text"><b><i class="fa fa-calendar"></i> </b></label>
+                                            <input type="text" class="w3-input" ng-model="bookingCtrl.booking.date" />
+                                        </div>
+                                        <br />
+                                        <div ng-if="!mainCtrl.isEditmode"><i class="fa fa-clock-o"></i> {{bookingCtrl.booking.hours}}</div>
+                                        <div ng-if="mainCtrl.isEditmode">
+                                            <label class="w3-text"><b><i class="fa fa-clock-o"></i> </b></label>
+                                            <input type="text" class="w3-input" ng-model="bookingCtrl.booking.hours" />
+                                        </div>
+                                    </td>
+                                    <td class="col-xs-8">
+                                        <div ng-if="!mainCtrl.isEditmode">{{bookingCtrl.booking.title}}</div>
+                                        <div ng-if="mainCtrl.isEditmode"><input type="text" class="w3-input" ng-model="bookingCtrl.booking.title" /></div>
+                                    </td>
+                                    <td class="col-xs-2">
+                                        {{bookingCtrl.getUsersForBooking().length}}/<span ng-if="mainCtrl.isEditmode"><input type="text" class="w3-input" ng-model="bookingCtrl.booking.maxBookings" /></span><span ng-if="!mainCtrl.isEditmode">{{bookingCtrl.booking.maxBookings}}</span> anmälda
+                                        <br />
+                                        <input type="button" class="w3-button w3-green" value="Anmälan" ng-click="bookingCtrl.openBookingModal()">
+                                        <br />
+                                        <a href="" ng-click="bookingCtrl.openBookedUsersModal()">Visa deltagare</a>
+                                        <button ng-if="mainCtrl.isEditmode" ng-click="mainCtrl.deleteBooking(booking)" class="w3-button w3-red"><i class="fa fa-trash"></i></button>
+                                    </td>
+                                </tr>
+
+                            </table>
+                            <div ng-attr-id="{{'booking-'+bookingCtrl.booking.$id}}" class="w3-modal">
+                                <div class="w3-modal-content">
+                                    <div class="w3-container">
+                                        <span ng-click="bookingCtrl.closeBookingModal()" class="w3-button w3-display-topright">&times;</span>
+                                        <table class="table">
+                                            <tr>
+                                                <th><i class="fa fa-user"></i> Namn</th>
+                                                <!--<th><i class="fa fa-cutlery"></i> Matbeställning</th>-->
+                                            </tr>
+                                            <tr>
+                                                <td><input type="text" class="form-control" ng-model="bookingCtrl.tempUserBooking.name" /></td>
+                                                <!--<td><select class="form-control" ng-model="bookingCtrl.tempUserBooking.foodOrder" ng-options="item for item in bookingCtrl.menuItems"></select></td>-->
+                                                <td>
+                                                    <input type="button" class="form-control btn btn-default" value="OK" ng-click="bookingCtrl.makeBooking()" />
+                                                </td>
+                                            </tr>
+
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div ng-attr-id="{{'userlist-'+bookingCtrl.booking.$id}}" class="w3-modal">
+                                <div class="w3-modal-content">
+                                    <div class="w3-container">
+                                        <span ng-click="bookingCtrl.closeBookedUsersModal()" class="w3-button w3-display-topright">&times;</span>
+                                        <table class="table">
+                                            <tr>
+                                                <th><i class="fa fa-user"></i> Namn</th>
+                                                <!--<th><i class="fa fa-cutlery"></i> Matbeställning</th>-->
+                                                <th></th>
+                                            </tr>
+                                            <tr ng-repeat="user in bookingCtrl.getUsersForBooking()">
+                                                <td>{{user.name}}</td>
+                                                <!--<td>{{user.foodOrder}}</td>-->
+                                                <td><button ng-if="mainCtrl.isAdmin" class="w3-btn w3-red"><i class="fa fa-trash" ng-click="bookingCtrl.removeUserFromBooking(user)"></i></button></td>
+                                            </tr>
+
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <footer class="w3-container">
+                            <hr />
+                            <button ng-if="mainCtrl.isAdmin" class="w3-button w3-block w3-border w3-border-green" ng-click="mainCtrl.addBooking()">
+                                Lägg till
+                            </button>
+                            <hr />
+                        </footer>
+                    </div>
+                </div>
+                <hr />
+            </div>
+        </div>
+    </div>
+</div>
